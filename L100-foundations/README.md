@@ -39,7 +39,7 @@ Work through the materials in order.
 2. `01_agent_bricks_types.md` Build the no code Agent Bricks agents in the UI, on the same tables and documents.
 3. `02_agent_evaluation.ipynb` Evaluate an agent with MLflow and a single LLM judge.
 4. `03_short_term_memory.ipynb` Give an agent short term memory backed by Lakebase.
-5. `L100-agent-openai-sdk/` Your first coded agent. It answers questions and consumes one read only MCP tool.
+5. `L100-agent-langgraph/` Your first coded agent. A LangGraph agent wrapped as an MLflow ResponsesAgent that answers questions and consumes one read only managed MCP tool.
 
 The shared data setup in the repo root `data/` folder must run once before this tier. It loads the coatings tables, the document volume, the Genie spaces, and the vector index.
 
@@ -71,7 +71,7 @@ Every query is driven from Python through `spark.sql(...)` with the catalog and 
 | `01_agent_bricks_types.md` | Guided build of the no code Agent Bricks types |
 | `02_agent_evaluation.ipynb` | MLflow evaluation with an LLM judge |
 | `03_short_term_memory.ipynb` | Short term memory on Lakebase |
-| `L100-agent-openai-sdk/` | First coded agent, with one MCP tool |
+| `L100-agent-langgraph/` | First coded agent (LangGraph + ResponsesAgent), with one MCP tool |
 | `L100_Architecture.drawio` | Architecture diagram for this tier (editable draw.io source; export to `L100_Architecture.png` to embed) |
 
 ---

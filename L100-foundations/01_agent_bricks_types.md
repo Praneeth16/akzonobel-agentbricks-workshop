@@ -21,7 +21,7 @@ Open the workspace and choose **New** then **Agent**. The Create new Agent dialo
 | Information Extraction | Pull named fields from text | Section 3 |
 | Document Parsing | Structure a PDF into text and tables | Section 4 |
 | Text Classification | Sort text into labels | Section 5 |
-| Code your own agent | Build with the Agent Framework | Section 6 and `L100-agent-openai-sdk/` |
+| Code your own agent | Build with the Agent Framework | Section 6 and `L100-agent-langgraph/` |
 | Supervisor Agent | Combine Genie, other agents, and MCP tools | Built in L300 |
 
 The first five are no code. Code your own is the bridge to L200. The Supervisor is the flagship you assemble in L300, and it reuses the agents you build here.
@@ -103,7 +103,7 @@ A Knowledge Assistant answers questions over documents using the vector index bu
 
 ## 6. Code your own agent
 
-When the no code types do not fit, you write the agent. The starter is in `L100-agent-openai-sdk/`. It is a small agent built with the OpenAI Agents SDK that answers questions and calls one read only MCP tool. Follow that folder's README to run it locally and deploy it.
+When the no code types do not fit, you write the agent. The starter is in `L100-agent-langgraph/`. It is a small LangGraph agent, wrapped as an MLflow ResponsesAgent, that answers questions and calls one read only managed MCP tool. Follow that folder's README to run it locally and deploy it.
 
 **Checkpoint:** the agent answers a coatings question and the trace shows it calling the MCP tool. This is your entry to the MCP spine, which you extend in L200 by building your own MCP server.
 

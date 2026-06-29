@@ -63,7 +63,7 @@ The workshop is organized around three capabilities that grow tier over tier.
 
 ## Status
 
-This repository is being built tier by tier. L100 foundations is complete and every notebook has been run end to end on a live workspace. L200, L300, and the hackathon kit are in progress.
+This repository is built tier by tier. L100 foundations is complete and every notebook has been run end to end on a live workspace. L200, L300, the hackathon kit, and the Vocareum course package are built and code-reviewed; their agent/app runtime paths still need in-workspace verification.
 
 | Item | State |
 |---|---|
@@ -74,8 +74,11 @@ This repository is being built tier by tier. L100 foundations is complete and ev
 | `L100-foundations/01_agent_bricks_types.md` | Built, UI and programmatic paths, prerequisites verified |
 | `L100-foundations/02_agent_evaluation.ipynb` | Built, run on workspace |
 | `L100-foundations/03_short_term_memory.ipynb` | Built, run on workspace |
-| L200, L300 | In progress |
-| `hackathon-starter-kit/` | Starter kit docs built: template, priority tracks, master-plan tracks, Genie-code prompts, and ai-dev-kit skills |
+| `L100-foundations/L100-agent-langgraph/` | Built (LangGraph + ResponsesAgent + 1 managed MCP tool), codex-reviewed; in-workspace run pending |
+| `L200-capabilities/` | Built (OpenAI SDK agent, MCP server, action_plane, Lakebase memory, eval), codex-reviewed; in-workspace run pending |
+| `L300-usecase/` | Built (LangGraph supervisor, full action_plane, e2e app, advanced eval), codex-reviewed; in-workspace run pending |
+| `hackathon-starter-kit/` | 11 tracks, 11 starter prompts, 6 ai-dev-kit skills, and the relocated AppKit hackathon hub |
+| `vocareum-course/` | Serverless Vocareum package: ordered notebooks, learner README, cfg, lifecycle scripts, `.dbc` bundle builder |
 
 ---
 

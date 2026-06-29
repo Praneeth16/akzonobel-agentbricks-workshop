@@ -78,7 +78,7 @@
     <mxCell id="a_cls" value="Text Classification&#10;&#8226; = ai_classify" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
       <mxGeometry x="848" y="385" width="185" height="70" as="geometry" />
     </mxCell>
-    <mxCell id="a_code" value="Code your own agent&#10;OpenAI Agents SDK&#10;(L100-agent-openai-sdk)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+    <mxCell id="a_code" value="Code your own agent&#10;LangGraph + ResponsesAgent&#10;(L100-agent-langgraph)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
       <mxGeometry x="1045" y="385" width="185" height="70" as="geometry" />
     </mxCell>
 
