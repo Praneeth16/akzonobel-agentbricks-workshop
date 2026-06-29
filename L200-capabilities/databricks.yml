@@ -1,0 +1,98 @@
+bundle:
+  name: akzo_l200_capabilities
+
+sync:
+  exclude:
+    - ".databricks"
+    - ".claude"
+    - ".venv"
+    - "node_modules"
+    - "load-test-runs"
+
+# Override per workspace at deploy time, e.g.:
+#   databricks bundle deploy --var="catalog=my_catalog" --var="warehouse_id=abc123"
+# Nothing here is tied to a specific workspace, user, profile, or warehouse.
+variables:
+  catalog:
+    description: Unity Catalog holding the akzo_* schemas and UC-function tools.
+    default: ""
+  tools_schema:
+    description: Schema holding the UC-function tools exposed to the agent.
+    default: "akzo_tools"
+  llm_endpoint:
+    description: >-
+      Serving endpoint / model the agent uses. REQUIRED — no default; pass it at
+      deploy, e.g. --var="llm_endpoint=databricks-claude-sonnet-4-5".
+    default: ""
+  experiment_id:
+    description: MLflow experiment id for tracing (set by quickstart).
+    default: ""
+  lakebase_instance:
+    description: Lakebase instance name for memory + the Action Plane.
+    default: ""
+
+resources:
+  apps:
+    akzo_capabilities_agent:
+      name: "agent-akzo-capabilities"
+      description: "AkzoNobel L200 capabilities agent (OpenAI Agents SDK + UC tools + Action Plane)"
+      source_code_path: ./
+      config:
+        command: ["uv", "run", "start-app"]
+        env:
+          - name: MLFLOW_TRACKING_URI
+            value: "databricks"
+          - name: MLFLOW_REGISTRY_URI
+            value: "databricks-uc"
+          - name: API_PROXY
+            value: "http://localhost:8000/invocations"
+          - name: CHAT_APP_PORT
+            value: "3000"
+          - name: CHAT_PROXY_TIMEOUT_SECONDS
+            value: "300"
+          - name: MLFLOW_EXPERIMENT_ID
+            value_from: "experiment"
+          - name: AGENT_NAME
+            value: "akzo-capabilities-agent"
+          - name: LLM_ENDPOINT
+            value: ${var.llm_endpoint}
+          - name: AKZO_CATALOG
+            value: ${var.catalog}
+          - name: AKZO_TOOLS_SCHEMA
+            value: ${var.tools_schema}
+          - name: LAKEBASE_AGENT_MEMORY_SCHEMA
+            value: "agent_openai_memory"
+          - name: LAKEBASE_INSTANCE_NAME
+            value: ${var.lakebase_instance}
+          - name: LAKEBASE_INSTANCE
+            value: ${var.lakebase_instance}
+          - name: LAKEBASE_SCHEMA
+            value: "akzo_actions"
+          - name: PGDATABASE
+            value: "databricks_postgres"
+          - name: PGPORT
+            value: "5432"
+          - name: ENABLE_ACTIONS_API
+            value: "false"
+
+      # Resources this app has access to. Add a Genie space / UC-function MCP
+      # server grant here when you wire tools — see the add-tools skill.
+      resources:
+        - name: 'experiment'
+          experiment:
+            experiment_id: ${var.experiment_id}
+            permission: 'CAN_MANAGE'
+
+targets:
+  dev:
+    mode: development
+    default: true
+
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+    resources:
+      apps:
+        akzo_capabilities_agent:
+          name: agent-akzo-capabilities

@@ -1,0 +1,6 @@
+# Grant the agent EXECUTE on UC functions in the tools schema.
+# Add under resources.apps.akzo_capabilities_agent.resources in databricks.yml.
+- name: 'akzo_tools_functions'
+  uc_function:
+    name: '${var.catalog}.akzo_tools.*'   # all functions in the schema
+    permission: 'EXECUTE'

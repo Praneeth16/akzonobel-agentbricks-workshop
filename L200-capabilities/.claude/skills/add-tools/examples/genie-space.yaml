@@ -1,0 +1,6 @@
+# Grant the agent CAN_RUN on a Genie space.
+# Add under resources.apps.akzo_capabilities_agent.resources in databricks.yml.
+- name: 'finance_genie'
+  genie_space:
+    space_id: '01234567-89ab-cdef'
+    permission: 'CAN_RUN'
