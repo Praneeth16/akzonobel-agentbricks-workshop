@@ -2,3 +2,5 @@ scratchpad/
 .DS_Store
 __pycache__/
 *.pyc
+data/output/
+data/setup/space_ids.json

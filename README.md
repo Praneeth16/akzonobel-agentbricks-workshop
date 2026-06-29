@@ -67,9 +67,11 @@ This repository is being built tier by tier. L100 foundations is complete and ev
 
 | Item | State |
 |---|---|
-| `data/` setup | Loaded and verified |
+| `data/` generators and `load_to_uc.py` | Run end to end, all 13 tables loaded |
+| `data/setup/setup_genie_spaces.py` | Run, three Genie spaces created and answering |
+| `data/setup/setup_vector_search.py` | Run, index ready |
 | `L100-foundations/00_sql_ai_functions.ipynb` | Built, run on workspace |
-| `L100-foundations/01_agent_bricks_types.md` | Built, prerequisites verified |
+| `L100-foundations/01_agent_bricks_types.md` | Built, UI and programmatic paths, prerequisites verified |
 | `L100-foundations/02_agent_evaluation.ipynb` | Built, run on workspace |
 | `L100-foundations/03_short_term_memory.ipynb` | Built, run on workspace |
 | L200, L300, hackathon kit | In progress |

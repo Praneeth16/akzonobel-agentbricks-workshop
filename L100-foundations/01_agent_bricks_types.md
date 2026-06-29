@@ -4,6 +4,8 @@ In `00_sql_ai_functions` you called AI from SQL. Now you build agents in the Age
 
 This is a guided lab. Each section is a short set of clicks in the Databricks UI, plus a checkpoint that tells you what a working result looks like. The data setup already created every resource you need (the tables, the document volume, the chunked docs, and the vector index), so you can focus on the agents.
 
+You do not have to click. Section 7 shows how to create the Genie spaces and the Knowledge Assistant backbone from Python instead, which is how you would set this up repeatably in a real project. The scripts live in `../data/setup/`.
+
 > Note: all data is synthetic. Product names, accounts, suppliers, and documents are invented for the workshop.
 
 ---
@@ -28,15 +30,15 @@ The first five are no code. Code your own is the bridge to L200. The Supervisor 
 
 ## Prerequisites
 
-Run the shared data setup first (see `../data/`). It provisions everything below in the `serverless_lakebase_praneeth_catalog` catalog. These resources were verified present for this workshop:
+Run the shared data setup first (see `../data/`). It provisions everything below into the Unity Catalog you choose. On a lab environment such as Vocareum that is your assigned catalog, so set the `catalog` widget in the notebooks to match. Shown here as `<catalog>`:
 
 | Resource | Location |
 |---|---|
 | Finance tables | `akzo_finance` (products, margin_actuals, margin_budget, fx_rates, cost_drivers) |
 | Supply chain tables | `akzo_scm` (otif, inventory, lanes, service_levels) |
 | Commercial tables | `akzo_commercial` (accounts, pipeline, sales_actuals, churn_signals) |
-| Document volume | `/Volumes/serverless_lakebase_praneeth_catalog/akzo_docs/raw` (sds, contracts) |
-| Vector index | `serverless_lakebase_praneeth_catalog.akzo_docs.chunks_idx` on endpoint `akzo_workshop_vs` |
+| Document volume | `/Volumes/<catalog>/akzo_docs/raw` (sds, contracts) |
+| Vector index | `<catalog>.akzo_docs.chunks_idx` on endpoint `akzo_workshop_vs` |
 
 ---
 
@@ -59,7 +61,7 @@ A Genie Space turns your tables into a chat experience. Business users ask in pl
 A Knowledge Assistant answers questions over documents using the vector index built during setup.
 
 1. In the Create new Agent dialog, choose **Knowledge Assistant**.
-2. Point it at the vector index `serverless_lakebase_praneeth_catalog.akzo_docs.chunks_idx` on endpoint `akzo_workshop_vs`.
+2. Point it at the vector index `<catalog>.akzo_docs.chunks_idx` on endpoint `akzo_workshop_vs`.
 3. Give it a name like `Coatings Document Assistant` and a short description: it answers questions about safety data sheets and supplier contracts.
 4. Ask: *What is the flash point and the main hazard listed on the safety data sheet for the Interpon powder coatings?*
 
@@ -81,7 +83,7 @@ A Knowledge Assistant answers questions over documents using the vector index bu
 ## 4. Document Parsing, structure a PDF
 
 1. In the Create new Agent dialog, choose **Document Parsing**.
-2. Point it at one PDF in `/Volumes/serverless_lakebase_praneeth_catalog/akzo_docs/raw/sds`.
+2. Point it at one PDF in `/Volumes/<catalog>/akzo_docs/raw/sds`.
 3. Run it.
 
 **Checkpoint:** the PDF comes back as structured elements, including the section headers and the product identification table. This is the UI version of `ai_parse_document`, and it is the first step of any document pipeline that feeds a Knowledge Assistant.
@@ -107,9 +109,43 @@ When the no code types do not fit, you write the agent. The starter is in `L100-
 
 ---
 
+## 7. Programmatic setup, the same resources from code
+
+Clicking is fine for learning. In a real project you create these resources from code so the setup is repeatable and reviewable. The `../data/setup/` folder does exactly that, and it was run and verified for this workshop.
+
+### Genie spaces from code
+
+`setup_genie_spaces.py` creates the three domain Genie spaces with the Genie Spaces API. Each space is grounded with table descriptions, an instruction block, example SQL, and sample questions. It is idempotent and writes the space ids to `space_ids.json`.
+
+```bash
+python ../data/setup/setup_genie_spaces.py --catalog <catalog>
+```
+
+Verify a space answers, using the Conversation API:
+
+```bash
+python ../data/setup/query_genie.py --catalog <catalog> --space finance
+```
+
+This returns real SQL and results. For example the finance space answered the Paints EMEA gross margin question with 39.3 percent in January, 40.0 in February, and 39.5 in March 2026, generated and run as SQL over the coatings tables.
+
+### Knowledge Assistant backbone from code
+
+`setup_vector_search.py` ensures the Vector Search endpoint and the delta sync index that a Knowledge Assistant reads, then reports when the index is ready.
+
+```bash
+python ../data/setup/setup_vector_search.py --catalog <catalog>
+```
+
+It prints the endpoint and index to point a Knowledge Assistant at. For this workshop the index reports ready with the document chunks indexed.
+
+**Checkpoint:** you created the Genie spaces and the Knowledge Assistant backbone without touching the UI, and confirmed a Genie space answers a question over the real tables. This is the repeatable pattern the L300 supervisor builds on.
+
+---
+
 ## What you built
 
-You created one of every single purpose Agent Bricks type, all grounded in the same coatings data. Each one maps to a SQL AI function you already met and to a hackathon track.
+You created one of every single purpose Agent Bricks type, in the UI and from code, all grounded in the same coatings data. Each one maps to a SQL AI function you already met and to a hackathon track.
 
 ### Next
 Continue to `02_agent_evaluation.ipynb` to measure agent quality, then `03_short_term_memory.ipynb`. After L100, move up to `../L200-capabilities/` to add tools, an MCP server you build, and the first agent that takes an action behind a human approval gate.
