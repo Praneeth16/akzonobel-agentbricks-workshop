@@ -51,7 +51,7 @@ Each level follows the lifecycle Ananya's repo already enforces: **Build → Eva
 
 **KTD1 — Adopt Ananya's ladder shape verbatim, rename for clarity.** Use `L100-foundations/`, `L200-capabilities/`, `L300-usecase/` instead of `simple/medium/advanced`. The directory skeleton per level (`.claude/skills/`, `AGENTS.md`, `CLAUDE.md`, `README.md`, `WORKSHOP_INSTRUCTIONS.md`, architecture `.png`, `agent_server/`, `scripts/`, `databricks.yml`, `app.yaml`) is copied from Ananya and re-themed. Rationale: proven pedagogy, less invention, faster build.
 
-**KTD2 — L100 is no/low-code first; code-your-own is the escape hatch.** L100 leads with SQL AI Functions (pure SQL, lowest barrier) and the managed Agent Bricks types (UI-driven), mirroring Ananya's L100 which already teaches Genie, Vector Search, AI Gateway, Knowledge Assistant, Supervisor, and Document Intelligence. The OpenAI-SDK coded agent comes last in L100 as the bridge to L200. Rationale: teach the product surface, not just code.
+**KTD2 — L100 is no/low-code first; code-your-own is the escape hatch.** L100 leads with SQL AI Functions (pure SQL, lowest barrier) and the managed Agent Bricks types (UI-driven), mirroring Ananya's L100 which already teaches Genie, Vector Search, AI Gateway, Knowledge Assistant, Supervisor, and Document Intelligence. The LangGraph coded agent — `create_react_agent` + one managed MCP tool, wrapped as an MLflow `ResponsesAgent` — comes last in L100 as the bridge to L200. Rationale: teach the product surface, not just code.
 
 **KTD3 — L300 supervisor composes prior tiers rather than rebuilding.** The supervisor wires the L100 Knowledge Assistant + extraction/classify agents and the L200 coded agents as sub-agents/MCP tools, and reuses `finance-copilot/backend/agent.py` as the Finance sub-agent. Rationale: matches the product's own description ("combines Genie Spaces, other agents, and MCP tools") and reuses built work (Malvika #1 feeds Malvika #3).
 
@@ -62,6 +62,8 @@ Each level follows the lifecycle Ananya's repo already enforces: **Build → Eva
 **KTD6 — Keep the existing AppKit hackathon hub as-is, relocate under the starter kit.** Move `apps/hackathon-hub/akzo-hackathon-hub/` into `hackathon-starter-kit/hackathon-hub/` unchanged (it already runs Register/Teams/Submit/Judge/Leaderboard on Lakebase). Rationale: it works and is itself a demo of the stack; no rebuild.
 
 **KTD7 — Source content lives in the published GitHub repos, not this empty clone.** This working copy holds only `USECASES.md`. Content is pulled from `Praneeth16/akzo-agent-bricks-workshop` (use-case apps, action_plane, hub, theme) and structure mirrored from `AnanyaDBJ/databricks-ai-workshops` (ladder skeleton, skills, data setup). Build is a port-and-restructure, not greenfield.
+
+**KTD8 — Framework per tier: LangGraph (L100) → OpenAI Agents SDK (L200) → LangGraph (L300), unified by MLflow `ResponsesAgent`.** Ananya is the *structure* source; `Praneeth16/akzo-agent-bricks-workshop` is the *agent-code* source. The L100 code-your-own agent ports the LangGraph pattern from Praneeth16 `notebooks/06_custom_agents_and_mcp.py` (`create_react_agent(ChatDatabricks, [tool])` wrapped as a `ResponsesAgent`, served with one managed MCP tool); L200 keeps Ananya `medium/`'s OpenAI Agents SDK agent; L300's supervisor is LangGraph (Ananya `advanced/`). The mix is deliberate, not drift: MLflow's `ResponsesAgent` wraps **any** framework, so the ladder demonstrates "any framework, no lock-in" under one serving/eval interface. Rationale: carry AkzoNobel's real agent code, not FreshMart's.
 
 ---
 
@@ -85,7 +87,7 @@ flowchart TD
 
 | Spine | L100 | L200 | L300 |
 |-------|------|------|------|
-| **Agent Bricks types** | Genie, Knowledge Assistant, `ai_extract`, `ai_parse_document`, `ai_classify`, code-your-own (intro) | add UC-function tools to coded agents | **Supervisor** composing all of the above |
+| **Agent Bricks types** | Genie, Knowledge Assistant, `ai_extract`, `ai_parse_document`, `ai_classify`, code-your-own intro (LangGraph) | add UC-function tools to coded agents (OpenAI Agents SDK) | **Supervisor** (LangGraph) composing all of the above |
 | **SQL AI functions** | `ai_query`, `ai_forecast`, `ai_summarize`, `ai_mask` + task fns | called from tools/agents | embedded in sub-agent pipelines |
 | **MCP** | consume 1 read-only tool | build + register an MCP server | full fleet wired to supervisor |
 | **Agents-that-act** | none (read-only) | 1–2 connectors, guardrails, human approval | all connectors, L1–L4 ladder, escalation, audit |
@@ -131,7 +133,7 @@ akzonobel-agentbricks-workshop/
 │   ├── 01_agent_bricks_types.md           # guided UI: Genie, Knowledge Assistant, Extraction, Parsing, Classification
 │   ├── 02_simple_agent_evaluation.ipynb   # MLflow eval + 1 judge + tracing
 │   ├── 03_short_term_memory.ipynb
-│   ├── L100-agent-openai-sdk/             # code-your-own + consume 1 MCP tool
+│   ├── L100-agent-langgraph/              # code-your-own (LangGraph) + consume 1 MCP tool
 │   └── .claude/skills/                    # quickstart, run-locally
 │
 ├── L200-capabilities/
@@ -227,12 +229,12 @@ The tree is a scope declaration, not a constraint; per-unit `**Files:**` are aut
 - **Verification:** A learner creates one of each type and gets a working response in the Playground.
 
 #### U5. L100 code-your-own agent + first MCP consume
-- **Goal:** Bridge from no-code to code with a minimal OpenAI-SDK agent that consumes one read-only MCP tool.
+- **Goal:** Bridge from no-code to code with a minimal LangGraph agent, wrapped as an MLflow `ResponsesAgent`, that consumes one read-only MCP tool.
 - **Requirements:** R2 (code-your-own), R4 (consume)
 - **Dependencies:** U2
-- **Files:** `L100-foundations/L100-agent-openai-sdk/agent_server/`, `app.yaml`, `databricks.yml`, `.claude/skills/quickstart/skill.md`, `.claude/skills/run-locally/skill.md`.
-- **Approach:** Port Ananya's `simple/L100-agent-openai-sdk/` unchanged in shape; re-point to coatings data; wire exactly one read-only MCP tool (e.g., a managed read-only data lookup). No actions.
-- **Patterns to follow:** Ananya `simple/L100-agent-openai-sdk/`.
+- **Files:** `L100-foundations/L100-agent-langgraph/agent_server/`, `app.yaml`, `databricks.yml`, `.claude/skills/quickstart/skill.md`, `.claude/skills/run-locally/skill.md`.
+- **Approach:** Port the LangGraph pattern from Praneeth16 `notebooks/06_custom_agents_and_mcp.py` — `create_react_agent(ChatDatabricks, [read_only_tool])` wrapped as a `ResponsesAgent`, served with one managed MCP tool — re-shaped into Ananya's `agent_server/` layout. Re-point to coatings data; wire exactly one read-only MCP tool (e.g., a managed read-only data lookup). No actions.
+- **Patterns to follow:** Praneeth16 `notebooks/06_custom_agents_and_mcp.py` (LangGraph agent + managed MCP + `ResponsesAgent`); Ananya `simple/L100-agent-openai-sdk/` for the `agent_server/` layout only.
 - **Test scenarios:**
   - Happy path: agent answers a finance question using the MCP tool; trace shows the tool call.
   - Edge: tool returns empty → agent responds gracefully without fabricating.
@@ -422,6 +424,7 @@ The tree is a scope declaration, not a constraint; per-unit `**Files:**` are aut
 **In scope:** the ladder restructure, the 7 agent types, SQL AI functions, the three deepening spines, the L300 supervisor flagship, and the hackathon starter kit with the nine tracks above.
 
 ### Deferred to Follow-Up Work
+- Build the L100 LangGraph coded agent (port of Praneeth16 `notebooks/06_custom_agents_and_mcp.py`) and, with it, rename `L100-agent-openai-sdk/` → `L100-agent-langgraph/` and update the references in `L100-foundations/README.md`, `01_agent_bricks_types.md`, and `L100_Architecture.drawio`.
 - Additional hackathon tracks beyond the nine (the remaining `USECASES.md` entries) can be added later using the U15 skills.
 - A `migrate-from-model-serving` deep lab (skill stub ships in L300; full content later).
 - Automated CI for the workshop notebooks.
@@ -458,7 +461,7 @@ The tree is a scope declaration, not a constraint; per-unit `**Files:**` are aut
 ## Sources & Research
 
 - **Structure:** `AnanyaDBJ/databricks-ai-workshops` — `simple/` (L100), `medium/` (L200), `advanced/` (L300), shared `data/`, per-level `.claude/skills/`, e2e Next.js chat app. L100 already teaches Genie, Vector Search, AI Gateway, Knowledge Assistant, Supervisor, Document Intelligence, MLflow eval, and HITL; lifecycle is Build→Evaluate→Govern→Deploy→Improve.
-- **Content:** `Praneeth16/akzo-agent-bricks-workshop` — `apps/_shared/action_plane/` (the `ActionPlane` 7-state machine and `evaluate()` guardrail engine with L1–L4 `level`), `apps/finance-copilot/` (reused as Finance sub-agent), `apps/action-center/` (approval-queue UI), `apps/hackathon-hub/` (AppKit event app), `apps/AKZONOBEL_THEME.md`, `VIBE_CODING_SESSION.md`.
+- **Content (agent code):** `Praneeth16/akzo-agent-bricks-workshop` — `notebooks/06_custom_agents_and_mcp.py` (the L100 code-your-own source: LangGraph `create_react_agent` + managed MCP, wrapped as an MLflow `ResponsesAgent`), `apps/_shared/action_plane/` (the `ActionPlane` 7-state machine and `evaluate()` guardrail engine with L1–L4 `level`), `apps/finance-copilot/` (reused as Finance sub-agent), `apps/action-center/` (approval-queue UI), `apps/hackathon-hub/` (AppKit event app), `apps/AKZONOBEL_THEME.md`, `VIBE_CODING_SESSION.md`. **Split:** Ananya supplies the ladder *structure* (skeleton, skills, data setup); Praneeth16 supplies the *agent code* and apps.
 - **Use cases:** `USECASES.md` — ranked list + Malvika picks (#6 forecast, #1 finance, #3 supervisor).
 - **Agent Bricks types:** the 7 Create-new-Agent types — Supervisor, Information Extraction (`ai_extract`), Knowledge Assistant, Document Parsing (`ai_parse_document`), Code-your-own, Text Classification (`ai_classify`), Genie Space.
 - **SQL AI Functions:** Databricks docs — general `ai_query`; task functions `ai_parse_document`, `ai_extract`, `ai_classify`, `ai_prep_search`, `ai_fix_grammar`, `ai_translate`, `ai_summarize`, `ai_mask`, `ai_analyze_sentiment`, `ai_similarity`, `ai_gen`, `ai_forecast`, `vector_search`.

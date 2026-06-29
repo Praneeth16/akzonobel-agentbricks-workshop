@@ -74,7 +74,8 @@ This repository is being built tier by tier. L100 foundations is complete and ev
 | `L100-foundations/01_agent_bricks_types.md` | Built, UI and programmatic paths, prerequisites verified |
 | `L100-foundations/02_agent_evaluation.ipynb` | Built, run on workspace |
 | `L100-foundations/03_short_term_memory.ipynb` | Built, run on workspace |
-| L200, L300, hackathon kit | In progress |
+| L200, L300 | In progress |
+| `hackathon-starter-kit/` | Starter kit docs built: template, priority tracks, master-plan tracks, Genie-code prompts, and ai-dev-kit skills |
 
 ---
 

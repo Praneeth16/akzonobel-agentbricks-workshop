@@ -37,7 +37,7 @@ Work through the materials in order.
 
 1. `00_sql_ai_functions.ipynb` Call AI from SQL alone. The lowest barrier entry point and the reference for every function used later.
 2. `01_agent_bricks_types.md` Build the no code Agent Bricks agents in the UI, on the same tables and documents.
-3. `02_simple_agent_evaluation.ipynb` Evaluate an agent with MLflow and a single LLM judge.
+3. `02_agent_evaluation.ipynb` Evaluate an agent with MLflow and a single LLM judge.
 4. `03_short_term_memory.ipynb` Give an agent short term memory backed by Lakebase.
 5. `L100-agent-openai-sdk/` Your first coded agent. It answers questions and consumes one read only MCP tool.
 
@@ -69,10 +69,10 @@ Every query is driven from Python through `spark.sql(...)` with the catalog and 
 |------|---------|
 | `00_sql_ai_functions.ipynb` | AI from SQL: query, classify, extract, parse, summarize, mask, forecast |
 | `01_agent_bricks_types.md` | Guided build of the no code Agent Bricks types |
-| `02_simple_agent_evaluation.ipynb` | MLflow evaluation with an LLM judge |
+| `02_agent_evaluation.ipynb` | MLflow evaluation with an LLM judge |
 | `03_short_term_memory.ipynb` | Short term memory on Lakebase |
 | `L100-agent-openai-sdk/` | First coded agent, with one MCP tool |
-| `L100_Architecture.png` | Architecture diagram for this tier |
+| `L100_Architecture.drawio` | Architecture diagram for this tier (editable draw.io source; export to `L100_Architecture.png` to embed) |
 
 ---
 
