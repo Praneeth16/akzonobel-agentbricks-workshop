@@ -1,0 +1,13 @@
+# L300 Multi-domain Supervisor — Databricks Apps runtime dependencies.
+# (Local dev uses pyproject.toml + uv; this file is for the Apps deploy surface.)
+fastapi>=0.129.0
+uvicorn>=0.41.0
+databricks-langchain[memory]>=0.17.0
+databricks-sdk>=0.79.0
+databricks-agents>=1.9.3
+mlflow>=3.10.0
+langgraph>=1.0.9
+langchain-mcp-adapters>=0.2.1
+psycopg[binary]>=3.2.0
+python-dotenv>=1.2.1
+uuid-utils>=0.9.0

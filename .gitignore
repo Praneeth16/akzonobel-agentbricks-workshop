@@ -1,6 +1,9 @@
 scratchpad/
 docs/plans/
 vocareum-course/dist/
+node_modules/
+.next/
+dist/
 .DS_Store
 __pycache__/
 *.pyc

@@ -1,0 +1,29 @@
+# Databricks Apps manifest for the Action Center.
+# The app service principal provides SDK auth automatically (no profile needed in Apps).
+# uvicorn serves both the API (/api/*) and the built React frontend (/) on the app port.
+# The Action Plane (action_plane/) + databricks_client.py + lakebase.py are bundled in backend/.
+command:
+  - uvicorn
+  - main:app
+  - --app-dir
+  - "backend"
+  - --host
+  - "0.0.0.0"
+  - --port
+  - "$DATABRICKS_APP_PORT"
+
+env:
+  - name: DATABRICKS_WAREHOUSE_ID
+    value: "<your-warehouse-id>"
+  - name: LAKEBASE_INSTANCE
+    value: "<your-lakebase-instance>"
+  - name: LAKEBASE_DBNAME
+    value: "databricks_postgres"
+  - name: LAKEBASE_SCHEMA
+    value: "akzo"
+  # The connectors call the mock systems through the UC HTTP connection
+  # akzo_external_systems; the connector layer reads its own config from env when
+  # deployed (see action_plane/connectors/_http.py). Set AKZO_MOCK_SYSTEMS_URL to
+  # your mock-systems app URL if using the SP-direct fallback path.
+  # - name: AKZO_MOCK_SYSTEMS_URL
+  #   value: "<your-mock-systems-app-url>"

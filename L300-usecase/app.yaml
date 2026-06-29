@@ -1,0 +1,45 @@
+# Databricks Apps spec for the L300 Multi-domain Supervisor (agent_server REST host).
+# Values come from the environment / app resources — nothing is hardcoded to a workspace.
+# Set the *_SPACE_ID, DATABRICKS_WAREHOUSE_ID, and LAKEBASE_INSTANCE values for your lab
+# (via `valueFrom` app resources, the deploy UI, or the bundle in databricks.yml).
+command: ["uvicorn", "agent_server.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+env:
+  - name: MLFLOW_TRACKING_URI
+    value: "databricks"
+  - name: MLFLOW_REGISTRY_URI
+    value: "databricks-uc"
+  # LLM + governed read plane.
+  # LLM_ENDPOINT is REQUIRED and has no code default. Uncomment and set it to a chat model
+  # serving endpoint you are entitled to (e.g. a Foundation Model API endpoint) before deploying:
+  # - name: LLM_ENDPOINT
+  #   value: "<your-chat-serving-endpoint>"
+  # - name: AKZO_CATALOG            # leave unset to use current_catalog()
+  #   value: "<your-catalog>"
+  - name: AKZO_FINANCE_SCHEMA
+    value: "akzo_finance"
+  - name: AKZO_SCM_SCHEMA
+    value: "akzo_scm"
+  - name: AKZO_COMMERCIAL_SCHEMA
+    value: "akzo_commercial"
+  # - name: DATABRICKS_WAREHOUSE_ID
+  #   valueFrom: "sql-warehouse"
+  # Genie spaces (one per domain) — wire via app resources / valueFrom.
+  # - name: FINANCE_SPACE_ID
+  #   valueFrom: "finance_genie"
+  # - name: SCM_SPACE_ID
+  #   valueFrom: "scm_genie"
+  # - name: COMMERCIAL_SPACE_ID
+  #   valueFrom: "commercial_genie"
+  # Lakebase (audit + Action Plane tables)
+  # - name: LAKEBASE_INSTANCE
+  #   value: "<your-lakebase-instance>"
+  - name: LAKEBASE_SCHEMA
+    value: "akzo"
+  # Action Plane connectors
+  - name: AKZO_HTTP_CONNECTION
+    value: "akzo_external_systems"
+  # - name: AKZO_MOCK_SYSTEMS_URL
+  #   value: "<your-mock-systems-app-host>"
+  - name: MLFLOW_EXPERIMENT_ID
+    valueFrom: "experiment"

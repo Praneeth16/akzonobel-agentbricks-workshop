@@ -1,0 +1,71 @@
+# Databricks Asset Bundle for the L300 Multi-domain Supervisor.
+# Fill in the bundle variables for your lab (warehouse, Genie spaces, Lakebase, experiment).
+# Nothing is hardcoded to a workspace; the values below are bundle variables you set at deploy.
+bundle:
+  name: akzo_multidomain_supervisor
+
+variables:
+  llm_endpoint:
+    description: Chat model serving endpoint you are entitled to (REQUIRED — no default).
+    default: ""
+  warehouse_id:
+    description: Serverless SQL warehouse id for the governed text2sql fallback legs.
+    default: ""
+  finance_space_id:
+    description: Genie space id for the Finance domain.
+    default: ""
+  scm_space_id:
+    description: Genie space id for the Supply Chain domain.
+    default: ""
+  commercial_space_id:
+    description: Genie space id for the Commercial domain.
+    default: ""
+  lakebase_instance:
+    description: Lakebase (managed Postgres) instance name for the audit + Action Plane tables.
+    default: ""
+  experiment_id:
+    description: MLflow experiment id for traces + models.
+    default: ""
+
+resources:
+  apps:
+    akzo_multidomain_supervisor:
+      name: "akzo-multidomain-supervisor"
+      description: "AkzoNobel Multi-domain Supervisor — Finance / SCM / Commercial Genie + full Action Plane"
+      source_code_path: ./
+      config:
+        command: ["uvicorn", "agent_server.main:app", "--host", "0.0.0.0", "--port", "8000"]
+        env:
+          - name: MLFLOW_TRACKING_URI
+            value: "databricks"
+          - name: MLFLOW_REGISTRY_URI
+            value: "databricks-uc"
+          - name: LLM_ENDPOINT
+            value: ${var.llm_endpoint}
+          - name: DATABRICKS_WAREHOUSE_ID
+            value: ${var.warehouse_id}
+          - name: FINANCE_SPACE_ID
+            value: ${var.finance_space_id}
+          - name: SCM_SPACE_ID
+            value: ${var.scm_space_id}
+          - name: COMMERCIAL_SPACE_ID
+            value: ${var.commercial_space_id}
+          - name: LAKEBASE_INSTANCE
+            value: ${var.lakebase_instance}
+          - name: LAKEBASE_SCHEMA
+            value: "akzo"
+          - name: AKZO_HTTP_CONNECTION
+            value: "akzo_external_systems"
+          - name: MLFLOW_EXPERIMENT_ID
+            value: ${var.experiment_id}
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/akzo_multidomain_supervisor/${bundle.target}
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/akzo_multidomain_supervisor/${bundle.target}
