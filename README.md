@@ -81,7 +81,3 @@ This repository is built tier by tier. L100 foundations is complete and every no
 | `vocareum-course/` | Serverless Vocareum package: ordered notebooks, learner README, cfg, lifecycle scripts, `.dbc` bundle builder |
 
 ---
-
-## Credits
-
-Structure follows the progressive workshop pattern from `AnanyaDBJ/databricks-ai-workshops`. Use cases and the agents that act capability come from the AkzoNobel engagement.
