@@ -1,0 +1,88 @@
+<mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="820" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <mxCell id="title" value="L200 Capabilities — Tools, MCP server, Agents-that-act, Memory" style="text;html=1;fontSize=18;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="40" y="15" width="1220" height="30" as="geometry" />
+    </mxCell>
+    <mxCell id="spines" value="Spines deepen: MCP — build &amp; register your own server &#183; Agents-that-act — 1-2 connectors behind a human approval gate &#183; LLMOps — judge suite + AI Gateway. Framework: OpenAI Agents SDK as an MLflow ResponsesAgent." style="text;html=1;fontSize=11;fontStyle=2;align=center;verticalAlign=middle;fontColor=#666666;" vertex="1" parent="1">
+      <mxGeometry x="40" y="45" width="1220" height="20" as="geometry" />
+    </mxCell>
+
+    <!-- BAND 1: DATA PLANE -->
+    <mxCell id="b1" value="Data Plane &#183; Unity Catalog (reused from L100)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;verticalAlign=top;align=left;fontStyle=1;fontSize=12;spacingLeft=8;spacingTop=4;" vertex="1" parent="1">
+      <mxGeometry x="40" y="80" width="1220" height="95" as="geometry" />
+    </mxCell>
+    <mxCell id="d_tbl" value="Coatings tables&#10;akzo_finance / scm / commercial" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="70" y="112" width="260" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="d_uc" value="UC functions&#10;(registered as tools)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="360" y="112" width="240" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="d_idx" value="Vector index&#10;akzo_docs.chunks_idx" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="630" y="112" width="240" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="d_lake" value="Lakebase&#10;(serverless Postgres)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="900" y="112" width="290" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- BAND 2: CODED AGENT -->
+    <mxCell id="b2" value="Coded Agent &#183; agent_server (OpenAI Agents SDK, served as MLflow ResponsesAgent)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;verticalAlign=top;align=left;fontStyle=1;fontSize=12;spacingLeft=8;spacingTop=4;" vertex="1" parent="1">
+      <mxGeometry x="40" y="200" width="1220" height="95" as="geometry" />
+    </mxCell>
+    <mxCell id="a_agent" value="Coded agent&#10;tool calling + reasoning" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+      <mxGeometry x="70" y="232" width="240" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="a_mcp" value="MCP server (you build &amp; register)&#10;exposes UC-function tools &#183; discover_tools" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+      <mxGeometry x="360" y="232" width="330" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="a_mem" value="Short + long-term memory&#10;on Lakebase" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+      <mxGeometry x="900" y="232" width="290" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- BAND 3: AGENTS THAT ACT -->
+    <mxCell id="b3" value="Agents-that-act &#183; action_plane (every action stops at PROPOSED until a human approves)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;verticalAlign=top;align=left;fontStyle=1;fontSize=12;spacingLeft=8;spacingTop=4;" vertex="1" parent="1">
+      <mxGeometry x="40" y="320" width="1220" height="130" as="geometry" />
+    </mxCell>
+    <mxCell id="ap_sm" value="State machine&#10;PROPOSED &#8594; APPROVED &#8594; EXECUTING &#8594; EXECUTED&#10;(REJECTED / FAILED / ESCALATED)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+      <mxGeometry x="70" y="355" width="340" height="75" as="geometry" />
+    </mxCell>
+    <mxCell id="ap_guard" value="Guardrail engine evaluate()&#10;action-type &#183; spend cap &#183; region scope&#10;breach &#8594; ESCALATED" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+      <mxGeometry x="440" y="355" width="320" height="75" as="geometry" />
+    </mxCell>
+    <mxCell id="ap_appr" value="Human approval gate&#10;separation of duties&#10;(proposer &#8800; approver)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+      <mxGeometry x="790" y="355" width="200" height="75" as="geometry" />
+    </mxCell>
+    <mxCell id="ap_conn" value="Connectors&#10;email &#183; ticket&#10;(action_events audit)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+      <mxGeometry x="1010" y="355" width="180" height="75" as="geometry" />
+    </mxCell>
+
+    <!-- BAND 4: LLMOps -->
+    <mxCell id="b4" value="LLMOps spine" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;verticalAlign=top;align=left;fontStyle=1;fontSize=12;spacingLeft=8;spacingTop=4;" vertex="1" parent="1">
+      <mxGeometry x="40" y="475" width="1220" height="95" as="geometry" />
+    </mxCell>
+    <mxCell id="l_judge" value="Judge suite&#10;correctness + groundedness" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="70" y="507" width="300" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="l_gw" value="AI Gateway&#10;rate limits + payload logging" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="400" y="507" width="300" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="l_trace" value="MLflow tracing&#10;tool calls + proposed actions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="730" y="507" width="300" height="50" as="geometry" />
+    </mxCell>
+
+    <mxCell id="foot" value="Everything parametrized: catalog, LLM endpoint, Lakebase instance, warehouse via env / current_catalog(). Built for Vocareum serverless." style="text;html=1;fontSize=11;fontStyle=2;align=center;verticalAlign=middle;fontColor=#666666;" vertex="1" parent="1">
+      <mxGeometry x="40" y="580" width="1220" height="20" as="geometry" />
+    </mxCell>
+
+    <!-- EDGES -->
+    <mxCell id="e_a_mcp" style="endArrow=block;html=1;rounded=1;strokeColor=#9673a6;" edge="1" parent="1" source="a_agent" target="a_mcp"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e_mcp_uc" value="calls" style="endArrow=block;html=1;rounded=1;dashed=1;strokeColor=#6c8ebf;fontSize=10;" edge="1" parent="1" source="a_mcp" target="d_uc"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e_a_mem" style="endArrow=block;html=1;rounded=1;strokeColor=#9673a6;" edge="1" parent="1" source="a_agent" target="a_mem"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e_a_ap" value="proposes action" style="endArrow=block;html=1;rounded=1;strokeColor=#d79b00;fontSize=10;" edge="1" parent="1" source="a_agent" target="ap_sm"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e_sm_guard" style="endArrow=block;html=1;rounded=1;strokeColor=#d79b00;" edge="1" parent="1" source="ap_sm" target="ap_guard"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e_guard_appr" style="endArrow=block;html=1;rounded=1;strokeColor=#d79b00;" edge="1" parent="1" source="ap_guard" target="ap_appr"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e_appr_conn" value="execute" style="endArrow=block;html=1;rounded=1;strokeColor=#d79b00;fontSize=10;" edge="1" parent="1" source="ap_appr" target="ap_conn"><mxGeometry relative="1" as="geometry" /></mxCell>
+  </root>
+</mxGraphModel>
