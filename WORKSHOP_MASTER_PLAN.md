@@ -17,7 +17,7 @@ The workshop teaches **all 7 Agent Bricks agent types** and the **SQL AI Functio
 - **Agents-that-act** — none (L100) → 1–2 connectors + human approval (L200) → all connectors + L1–L4 approval ladder + audit (L300)
 - **LLMOps** — MLflow eval + 1 judge + tracing (L100) → judge suite + AI Gateway + guardrails (L200) → production monitoring + UC lineage + advanced eval (L300)
 
-L300 culminates in the flagship **Multi-domain supervisor** (Finance / SCM / Commercial Genie spaces) that reuses the already-built `finance-copilot` as a sub-agent. A separate **`hackathon-starter-kit/`** folder ships ai-dev-kit skills, starter prompts, per-track READMEs (top-8 use cases + doc-extraction cluster), and the existing AppKit hackathon hub.
+L300 culminates in the flagship **Multi-domain supervisor** (Finance / SCM / Commercial Genie spaces) that reuses the already-built `finance-copilot` as a sub-agent. A separate **`hackathon-starter-kit/`** folder ships ai-dev-kit skills, starter prompts, per-track READMEs (six priority use cases + five master-plan additions = 11 tracks), and the existing AppKit hackathon hub.
 
 ---
 
@@ -40,7 +40,7 @@ We want the **best of both**: Ananya's ladder shape and LLMOps rigor, carrying A
 | R5 | Weave agents-that-act via `action_plane`: L100 none → L200 1–2 connectors with guardrails + human approval → L300 all connectors + L1–L4 approval ladder + audit trail. |
 | R6 | Make LLMOps a deepening spine across all tiers: MLflow eval + LLM judges, tracing, production monitoring, UC governance, AI Gateway. |
 | R7 | L300 flagship = Multi-domain supervisor routing to Finance / SCM / Commercial Genie spaces, reusing the existing `finance-copilot` as the Finance sub-agent. |
-| R8 | Separate `hackathon-starter-kit/` with ai-dev-kit `.claude/skills/`, starter prompts, per-track READMEs (top-8 from `USECASES.md` + doc-extraction cluster #15–18), and the existing AppKit hackathon hub. |
+| R8 | Separate `hackathon-starter-kit/` with ai-dev-kit `.claude/skills/`, starter prompts, per-track READMEs (six priority tracks + five master-plan additions from `USECASES.md`, including the doc-extraction cluster #15–18 = 11 tracks), and the existing AppKit hackathon hub. |
 | R9 | Every level ships a `WORKSHOP_INSTRUCTIONS.md` / `LAB_GUIDE.md` and architecture diagram so it stands alone. |
 
 Each level follows the lifecycle Ananya's repo already enforces: **Build → Evaluate → Govern → Deploy → Improve.**
@@ -155,22 +155,35 @@ akzonobel-agentbricks-workshop/
 │   ├── agent_evaluation_advanced.ipynb    # advanced eval + production monitoring + UC lineage
 │   └── .claude/skills/                    # modify-agent, migrate-from-model-serving
 │
-└── hackathon-starter-kit/
+├── hackathon-starter-kit/
     ├── README.md
-    ├── .claude/skills/                    # scaffold-copilot, add-connector, add-genie-space, add-mcp-tool, deploy
-    ├── starter-prompts/                   # vibe-coding prompts per track
-    ├── tracks/                            # one folder per track, each with README guide + starter scaffold
-    │   ├── 01-finance-controlling/README.md
-    │   ├── 02-supply-chain-tower/README.md
-    │   ├── 03-multi-domain-supervisor/README.md
-    │   ├── 04-ai-governance/README.md
-    │   ├── 05-commercial-action/README.md
-    │   ├── 06-forecast-planner-mmf/README.md
-    │   ├── 07-procurement-contracts/README.md
-    │   ├── 08-knowledge-assistant/README.md
-    │   └── 09-doc-extraction-cluster/README.md   # #15 product/safety + #16 claims + #17 ESG + #18 pricing
+    ├── .claude/skills/                    # scaffold-copilot, add-connector, add-genie-space, add-mcp-tool, deploy, generate-synthetic-data
+    ├── starter-prompts/                   # one vibe-coding prompt per track (11)
+    ├── TRACK_TEMPLATE.md                  # template every track README follows
+    ├── tracks/                            # one folder per track, each with README guide
+    │   ├── 01-finance-controlling/README.md          # priority
+    │   ├── 02-multi-domain-supervisor/README.md      # priority
+    │   ├── 03-procurement-contracts/README.md        # priority
+    │   ├── 04-access-provisioning/README.md          # priority
+    │   ├── 05-forecast-planner-mmf/README.md         # priority
+    │   ├── 06-pricing-quote-generation/README.md     # priority
+    │   ├── 07-supply-chain-control-tower/README.md   # master-plan addition
+    │   ├── 08-ai-governance-policy/README.md         # master-plan addition
+    │   ├── 09-commercial-action/README.md            # master-plan addition
+    │   ├── 10-enterprise-knowledge-assistant/README.md  # master-plan addition
+    │   └── 11-doc-extraction-cluster/README.md       # #15 product/safety + #16 claims + #17 ESG
     └── hackathon-hub/                     # existing AppKit event app, moved unchanged
+│
+└── vocareum-course/                       # additive delivery layer: packages the ladder for Vocareum
+    ├── courseware/                        # authored wrappers: _AGENDA/00 - Start Here, 01 - Setup Check, 99 - Wrap Up
+    ├── docs/README.md                     # learner-facing right-pane README (-> /voc/docs)
+    ├── scripts/                           # build_bundle.py + workspace_init/user_setup/lab_setup/lab_end
+    ├── vocareum/akzonobel-agent-bricks.cfg  # course config (entry = _AGENDA/00 - Start Here)
+    ├── course-image/                      # 810x520 course tile (add before public enrollment)
+    └── dist/                              # built bundle zip (gitignored)
 ```
+
+The `vocareum-course/` layer is additive: it does not change the ladder. `scripts/build_bundle.py` assembles the tier notebooks (L100 today; L200/L300 picked up automatically once built, placeholders until then) plus the wrappers into a `.ipynb` bundle for upload. See `vocareum-course/README-project.md`.
 
 The tree is a scope declaration, not a constraint; per-unit `**Files:**` are authoritative.
 
@@ -386,12 +399,12 @@ The tree is a scope declaration, not a constraint; per-unit `**Files:**` are aut
 - **Test scenarios:** `Test expectation: none — prompt content.`
 - **Verification:** Each prompt references its track's data and the relevant skill.
 
-#### U17. Per-track READMEs (top-8 + doc-extraction cluster)
+#### U17. Per-track READMEs (six priority tracks + five master-plan additions = 11)
 - **Goal:** One forkable guide per track: goal, data, starter scaffold, MCP/action hints, judging rubric.
 - **Requirements:** R8
 - **Dependencies:** U15, U16
-- **Files:** `hackathon-starter-kit/tracks/01-finance-controlling/README.md` … `09-doc-extraction-cluster/README.md`.
-- **Approach:** Author nine track guides from `USECASES.md`: the top 8 (finance controlling, supply-chain tower, multi-domain supervisor, AI governance, commercial action, forecast planner on MMF, procurement contracts, knowledge assistant) plus a doc-extraction cluster folding #15 product/safety extraction, #16 claims/ticket drafting, #17 ESG questionnaire, #18 pricing/quote. Each maps to taught material (which level/skill to start from) and a rubric.
+- **Files:** `hackathon-starter-kit/tracks/01-finance-controlling/README.md` … `11-doc-extraction-cluster/README.md`, plus `TRACK_TEMPLATE.md`.
+- **Approach:** Author eleven track guides from `USECASES.md`, all following `TRACK_TEMPLATE.md`. The six priority tracks called out for Malvika and team (finance controlling, multi-domain supervisor, procurement contracts, access provisioning, forecast planner on MMF, pricing/quote generation) plus five master-plan additions (supply-chain control tower, AI governance/policy, commercial action, enterprise knowledge assistant, doc-extraction cluster folding #15 product/safety + #16 claims + #17 ESG). Each maps to taught material (which level/skill to start from) and a rubric.
 - **Patterns to follow:** `USECASES.md` entries; source hackathon hub `client/src/pages/Challenges.tsx`.
 - **Test scenarios:** `Test expectation: none — guide content.` Cross-check each track names its data tables and starting skill.
 - **Verification:** A team can pick a track and reach a running scaffold from its README alone.
@@ -421,11 +434,11 @@ The tree is a scope declaration, not a constraint; per-unit `**Files:**` are aut
 
 ## Scope Boundaries
 
-**In scope:** the ladder restructure, the 7 agent types, SQL AI functions, the three deepening spines, the L300 supervisor flagship, and the hackathon starter kit with the nine tracks above.
+**In scope:** the ladder restructure, the 7 agent types, SQL AI functions, the three deepening spines, the L300 supervisor flagship, and the hackathon starter kit with the eleven tracks above.
 
 ### Deferred to Follow-Up Work
 - Build the L100 LangGraph coded agent (port of Praneeth16 `notebooks/06_custom_agents_and_mcp.py`) and, with it, rename `L100-agent-openai-sdk/` → `L100-agent-langgraph/` and update the references in `L100-foundations/README.md`, `01_agent_bricks_types.md`, and `L100_Architecture.drawio`.
-- Additional hackathon tracks beyond the nine (the remaining `USECASES.md` entries) can be added later using the U15 skills.
+- Additional hackathon tracks beyond the eleven (the remaining `USECASES.md` entries) can be added later using the U15 skills.
 - A `migrate-from-model-serving` deep lab (skill stub ships in L300; full content later).
 - Automated CI for the workshop notebooks.
 

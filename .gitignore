@@ -1,5 +1,6 @@
 scratchpad/
 docs/plans/
+vocareum-course/dist/
 .DS_Store
 __pycache__/
 *.pyc
