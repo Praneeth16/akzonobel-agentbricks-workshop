@@ -1,0 +1,20 @@
+command: ['npm', 'run', 'start']
+# NOTE: Databricks Apps env values are literals (no ${VAR} interpolation here).
+# Replace the placeholder values below with your own workspace resources before
+# deploying. On Vocareum, use the SQL warehouse / catalog assigned to your lab.
+env:
+  # SQL warehouse for the analytics plugin (the live "Try it live" panels).
+  - name: DATABRICKS_WAREHOUSE_ID
+    value: '<your-sql-warehouse-id>'
+  # Lakebase (managed Postgres) instance backing the hackathon state (hack_* tables).
+  - name: LAKEBASE_INSTANCE
+    value: '<your-lakebase-instance>'
+  - name: LAKEBASE_DBNAME
+    value: 'databricks_postgres'
+  - name: LAKEBASE_SCHEMA
+    value: 'akzo'
+  # Unity Catalog catalog holding the akzo_* schemas the live panels query.
+  - name: WORKSHOP_CATALOG
+    value: '<your-uc-catalog>'
+  - name: DATABRICKS_CHAT_ENDPOINT
+    value: 'databricks-claude-opus-4-7'

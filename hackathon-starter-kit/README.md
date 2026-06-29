@@ -18,7 +18,7 @@ The first six tracks are the priority use cases called out for Malvika and the t
 | `starter-prompts/` | One ready-to-use prompt per track |
 | `tracks/` | Forkable team guides using the required track template |
 | `TRACK_TEMPLATE.md` | The template every track README follows |
-| `hackathon-hub/` | Placeholder for the AppKit event hub from the source workshop app |
+| [`hackathon-hub/`](./hackathon-hub/) | The AppKit event hub app: Register / Teams / Submit / Judge / Leaderboard on Lakebase. See its README to configure env vars and run it. |
 
 ---
 
