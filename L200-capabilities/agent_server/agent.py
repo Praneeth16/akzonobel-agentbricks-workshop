@@ -50,22 +50,49 @@ from agent_server.utils import (
 logger = logging.getLogger(__name__)
 
 # NOTE: this will work for all databricks models OTHER than GPT-OSS, which uses a slightly different API
-set_default_openai_client(AsyncDatabricksOpenAI())
-set_default_openai_api("chat_completions")
-set_trace_processors([])  # only use mlflow for trace processing
-mlflow.openai.autolog()
+# STARTUP RESILIENCE: building the OpenAI client / enabling autolog can touch ambient auth.
+# Never let that crash the server at import — the app must always boot so it can surface
+# errors per-request instead of failing to start (Databricks Apps health check fails on a
+# dead boot). Anything that did not initialize is retried lazily on the first request.
+try:
+    set_default_openai_client(AsyncDatabricksOpenAI())
+    set_default_openai_api("chat_completions")
+    set_trace_processors([])  # only use mlflow for trace processing
+    mlflow.openai.autolog()
+except Exception as e:  # noqa: BLE001
+    logger.warning(
+        "Could not fully initialize the OpenAI client / tracing at import (%s); "
+        "the server will still start and retry lazily per request.", e,
+    )
 
 NAME = os.environ.get("AGENT_NAME", "akzo-capabilities-agent")
 
 # LLM_ENDPOINT is required — never a code default. Set it explicitly per deploy
 # (app.yaml / databricks.yml) so the agent is not silently tied to one model.
+# DO NOT raise at import: a missing env var must not crash the app server at boot.
+# We surface a clear 400 per-request instead (see _require_model), so the app starts,
+# passes its health check, and an operator can read the error in the app logs.
 MODEL = os.environ.get("LLM_ENDPOINT")
 if not MODEL:
-    raise RuntimeError(
-        "LLM_ENDPOINT is not set. Set it to a serving endpoint you are entitled to "
-        "(in .env for local runs, or in app.yaml / databricks.yml for deploys). "
-        "It has no default so the agent is never tied to one workspace's model."
+    logger.warning(
+        "LLM_ENDPOINT is not set. The server will start, but every request will fail "
+        "until you set it to a serving endpoint you are entitled to (in .env for local "
+        "runs, or in app.yaml / databricks.yml for deploys). It has no default so the "
+        "agent is never tied to one workspace's model."
     )
+
+
+def _require_model() -> str:
+    """Return the configured model endpoint, or raise a clear per-request error."""
+    if not MODEL:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "LLM_ENDPOINT is not set. Set it to a serving endpoint you are entitled "
+                "to (app.yaml / databricks.yml config env) and restart the app."
+            ),
+        )
+    return MODEL
 
 SYSTEM_PROMPT = (
     "You are the AkzoNobel Capabilities Agent. You help analysts answer questions "
@@ -145,7 +172,7 @@ def create_agent(mcp_servers: List[MCPServer]) -> Agent:
     return Agent(
         name=NAME,
         instructions=SYSTEM_PROMPT,
-        model=MODEL,
+        model=_require_model(),
         mcp_servers=mcp_servers,
     )
 

@@ -22,8 +22,12 @@ dependencies = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+# Package dirs don't match the project name, so tell hatchling exactly what to ship in the
+# wheel. ``action_plane`` lives under ``agent_server/`` so it ships with it; ``scripts`` is a
+# top-level package (the setup-lakebase / seed-policies / smoke entry points), so list it too —
+# otherwise the wheel build fails ("Unable to determine which files to ship").
 [tool.hatch.build.targets.wheel]
-packages = ["agent_server"]
+packages = ["agent_server", "scripts"]
 
 [dependency-groups]
 dev = [
@@ -35,5 +39,6 @@ dev = [
 start-server = "agent_server.start_server:main"
 setup-lakebase = "scripts.setup_lakebase:main"
 seed-policies = "scripts.seed_action_policies:main"
+grant-app-access = "scripts.grant_app_access:main"
 smoke-supervisor = "scripts.smoke_supervisor:main"
 test-action-ladder = "scripts.test_action_ladder:main"

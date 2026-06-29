@@ -27,6 +27,7 @@ This is the L100 rung of the "any framework, any model, no lock-in" ladder: the 
 all resolve from the environment (see ``agent_server/utils.py``).
 """
 
+import logging
 from typing import Any
 
 import mlflow
@@ -162,7 +163,15 @@ def _build_tool():
     AKZO_LOCAL_TOOL=1."""
     if use_local_tool():
         return coatings_data_lookup_local
-    return _build_mcp_tool()
+    try:
+        return _build_mcp_tool()
+    except Exception as e:  # noqa: BLE001 — never let a managed-MCP hiccup crash the server
+        logging.warning(
+            "Managed MCP tool unavailable (%s); falling back to the in-process local tool. "
+            "Check the workspace host, that coatings_data_lookup is registered, and that the "
+            "app's principal has EXECUTE on it.", e,
+        )
+        return coatings_data_lookup_local
 
 
 _graph = create_react_agent(

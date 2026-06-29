@@ -14,7 +14,11 @@ env:
   # serving endpoint you are entitled to (e.g. a Foundation Model API endpoint) before deploying:
   # - name: LLM_ENDPOINT
   #   value: "<your-chat-serving-endpoint>"
-  # - name: AKZO_CATALOG            # leave unset to use current_catalog()
+  # AKZO_CATALOG is REQUIRED in Databricks Apps: the app runtime has NO Spark session, so
+  # current_catalog() cannot resolve there and get_catalog() fails fast. Set it to the catalog
+  # holding the coatings schemas (uncomment + fill in, or deploy via databricks.yml with
+  # `--var catalog=<your-catalog>`). Locally you can leave it unset and rely on current_catalog().
+  # - name: AKZO_CATALOG
   #   value: "<your-catalog>"
   - name: AKZO_FINANCE_SCHEMA
     value: "akzo_finance"

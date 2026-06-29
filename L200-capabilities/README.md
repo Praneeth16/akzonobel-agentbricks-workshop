@@ -38,7 +38,7 @@ Work through the materials in order. Read the **quickstart** and **discover-tool
 3. **Add memory.** Set a Lakebase instance in `.env` and run `scripts/lakebase_setup_script.ipynb`. See the **agent-memory** skill.
 4. **Turn on actions.** Run `scripts/actions_schema_setup.py`, set `ENABLE_ACTIONS_API=true`, and the agent can propose email and ticket actions through the Action Plane. See `action_plane/README.md`.
 5. **Evaluate.** Open `agent_evaluation.ipynb` to run the correctness and groundedness judge suite and configure AI Gateway.
-6. **Deploy.** Follow the **deploy** skill to ship the agent as a Databricks App.
+6. **Deploy.** Follow the **deploy** skill to ship the agent as a Databricks App. Pass your catalog at deploy time — `databricks bundle deploy --var catalog=<your_catalog> --var llm_endpoint=<your_endpoint>` — because the Apps runtime does not resolve `current_catalog()`; the app reads `AKZO_CATALOG` from the bundle variable. After the app exists, grant its service principal Unity Catalog access (it runs as its own SP, not you): `uv run grant-app-access --service-principal <sp-client-id> --catalog $AKZO_CATALOG --data-schema akzo_finance`.
 
 The shared data setup in the repo root `data/` folder must run once before this tier.
 
@@ -72,6 +72,7 @@ Nothing here is tied to one workspace. The agent reads its catalog, model endpoi
 | `scripts/discover_tools.py` | Discover workspace resources |
 | `scripts/lakebase_setup_script.ipynb` | Prepare Lakebase for memory and actions |
 | `scripts/actions_schema_setup.py` | Create Action Plane tables and seed L200 policies |
+| `scripts/grant_app_access.py` | Grant the deployed app's SP Unity Catalog access (USE CATALOG/SCHEMA, EXECUTE on functions, SELECT on tables) |
 | `scripts/grant_lakebase_permissions.py` | Grant the deployed app's SP access to Lakebase |
 | `scripts/app_deployment_script.ipynb` | SDK based deploy alternative to the CLI |
 | `agent_evaluation.ipynb` | Judge suite and AI Gateway |

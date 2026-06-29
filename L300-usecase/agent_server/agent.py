@@ -23,9 +23,7 @@ import json
 from typing import Any
 
 import mlflow
-from databricks_langchain import ChatDatabricks
 from langchain_core.tools import tool
-from langgraph.prebuilt import create_react_agent
 from mlflow.pyfunc import ResponsesAgent
 from mlflow.types.responses import ResponsesAgentRequest, ResponsesAgentResponse
 
@@ -34,8 +32,6 @@ from agent_server.utils import get_llm_endpoint
 
 # Trace every LangChain/LangGraph step into the active MLflow experiment.
 mlflow.langchain.autolog()
-
-LLM_ENDPOINT = get_llm_endpoint()
 
 SYSTEM_PROMPT = (
     "You are the AkzoNobel Multi-domain Supervisor. You answer cross-functional questions "
@@ -108,11 +104,32 @@ def propose_action(action_type: str, subject: str, region: str, payload: dict,
     return json.dumps({"action": action, "guardrail": verdict, "ladder": decision}, default=str)
 
 
-_graph = create_react_agent(
-    ChatDatabricks(endpoint=LLM_ENDPOINT),
-    tools=[ask_supervisor, propose_action],
-    prompt=SYSTEM_PROMPT,
-)
+_graph = None
+
+
+def _build_graph():
+    """Build the supervisor ReAct graph lazily, on first request.
+
+    Building at import time would call get_llm_endpoint() and ChatDatabricks() while the
+    module loads — if LLM_ENDPOINT is unset or model serving is unreachable, the whole app
+    would crash on boot in Databricks Apps. Deferring to the first predict() lets the server
+    start (so /api/health and config errors surface per-request) and avoids a boot-time crash.
+    """
+    from databricks_langchain import ChatDatabricks
+    from langgraph.prebuilt import create_react_agent
+
+    return create_react_agent(
+        ChatDatabricks(endpoint=get_llm_endpoint()),
+        tools=[ask_supervisor, propose_action],
+        prompt=SYSTEM_PROMPT,
+    )
+
+
+def _get_graph():
+    global _graph
+    if _graph is None:
+        _graph = _build_graph()
+    return _graph
 
 
 def _to_lc_messages(request: ResponsesAgentRequest) -> list[dict[str, Any]]:
@@ -134,7 +151,7 @@ class AkzoSupervisorAgent(ResponsesAgent):
     """LangGraph multi-domain supervisor exposed through the MLflow ResponsesAgent interface."""
 
     def predict(self, request: ResponsesAgentRequest) -> ResponsesAgentResponse:
-        out = _graph.invoke({"messages": _to_lc_messages(request)})
+        out = _get_graph().invoke({"messages": _to_lc_messages(request)})
         return ResponsesAgentResponse(
             output=[{
                 "id": "msg-1",

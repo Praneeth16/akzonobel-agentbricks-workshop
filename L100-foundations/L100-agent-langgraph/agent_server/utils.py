@@ -80,13 +80,21 @@ def get_llm_endpoint() -> str:
 
 def get_databricks_host() -> Optional[str]:
     """Resolve the workspace host from env or the Databricks SDK config."""
+    def _with_scheme(h):
+        # Databricks Apps inject DATABRICKS_HOST as a bare hostname (no scheme);
+        # the MCP/HTTP client needs an absolute http(s):// URL.
+        if not h:
+            return None
+        h = h.rstrip("/")
+        return h if h.startswith(("http://", "https://")) else f"https://{h}"
+
     host = os.environ.get("DATABRICKS_HOST")
     if host:
-        return host.rstrip("/")
+        return _with_scheme(host)
     try:
         from databricks.sdk import WorkspaceClient
 
-        return WorkspaceClient().config.host
+        return _with_scheme(WorkspaceClient().config.host)
     except Exception as e:  # noqa: BLE001
         logging.debug("Could not resolve Databricks host: %s", e)
         return None

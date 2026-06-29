@@ -17,8 +17,10 @@ env:
   # LLM endpoint is REQUIRED (no default in code). Set it to a model you are entitled to.
   - name: LLM_ENDPOINT
     value: "databricks-meta-llama-3-3-70b-instruct"
-  # Catalog is optional: defaults to current_catalog(). Uncomment to pin it.
+  # Catalog: current_catalog() does NOT resolve in the Apps runtime (no SQL context),
+  # so AKZO_CATALOG MUST be set for app deploys. Via DABs it comes from `--var catalog=...`
+  # (see databricks.yml). For a raw `databricks apps deploy`, set it here:
   # - name: AKZO_CATALOG
-  #   value: "your_catalog"
-  # - name: AKZO_SCHEMA
-  #   value: "akzo_finance"
+  #   value: "<your_catalog>"
+  - name: AKZO_SCHEMA
+    value: "akzo_finance"

@@ -52,7 +52,7 @@ The per domain description lines in `agent_server/subagents/*.py` are exactly th
 
 The shared data setup in the repo root `data/` folder must run once before this tier. It loads the coatings tables for all three domains, the documents, the Genie spaces, and the vector index.
 
-1. Copy `.env.example` to `.env` and set your lab's values (catalog is optional, it defaults to `current_catalog()`). Set the warehouse, the three Genie space ids if you have them, and the Lakebase instance.
+1. Copy `.env.example` to `.env` and set your lab's values. Locally the catalog is optional — it defaults to `current_catalog()`. Set the LLM endpoint, the warehouse, the three Genie space ids if you have them, and the Lakebase instance.
 2. `uv run setup-lakebase` then `uv run seed-policies` to create the audit and Action Plane tables and load the guardrail policies for the ladder.
 3. `uv run smoke-supervisor` to see routing and fusion across all three domains.
 4. `uv run start-server` to serve the supervisor over the Responses API, or `uvicorn agent_server.main:app --port 8000` for the simple REST host.
@@ -60,6 +60,32 @@ The shared data setup in the repo root `data/` folder must run once before this 
 6. Work through `agent_evaluation_advanced.ipynb` for production monitoring, lineage, and the regression gate.
 
 Nothing is hardcoded to a workspace. The catalog, schemas, LLM endpoint, warehouse, Genie space ids, and Lakebase instance all come from the environment, so the same code runs identically on a lab such as Vocareum or your own workspace.
+
+---
+
+## Deploy to Databricks Apps
+
+The app is deployed with the bundle in `databricks.yml`. Every workspace value is a bundle variable, so nothing is hardcoded — you supply them at deploy time:
+
+```bash
+databricks bundle deploy \
+  --var catalog=<your_catalog> \
+  --var llm_endpoint=<your_chat_serving_endpoint> \
+  --var warehouse_id=<your_warehouse_id> \
+  --var finance_space_id=<...> --var scm_space_id=<...> --var commercial_space_id=<...> \
+  --var lakebase_instance=<your_lakebase_instance> \
+  --var experiment_id=<your_mlflow_experiment_id>
+```
+
+`catalog` is **required for Apps**. The Apps runtime has no Spark session, so `current_catalog()` cannot resolve there; `AKZO_CATALOG` is set from `${var.catalog}` in the app's `config.env`. (Locally, `current_catalog()` still works, so the `.env` catalog stays optional.)
+
+After deploying, grant the app's service principal the access it needs to read the three domain schemas and run the governed action path:
+
+```bash
+uv run grant-app-access --sp <app-service-principal> --catalog <your_catalog>
+```
+
+This grants the SP `USE CATALOG` / `USE SCHEMA` / `SELECT` on the finance, SCM, and commercial schemas, `EXECUTE` on the `akzo_external_systems` UC connection, and `CAN RUN` on each domain's Genie space (read from the `*_SPACE_ID` env; pass `--skip-genie` to skip). The SP and the catalog are parameters — neither is hardcoded. The SP also needs `CAN_USE` on the warehouse and access to the Lakebase instance, which you grant from the workspace UI.
 
 ---
 
@@ -88,7 +114,7 @@ Nothing is hardcoded to a workspace. The catalog, schemas, LLM endpoint, warehou
 | `action-center/` | The human in the loop approval queue app (ladder meter, guardrail chips, timeline) |
 | `e2e-chatbot-app/` | The end to end governed chat app, pointed at the supervisor |
 | `agent_evaluation_advanced.ipynb` | Production monitoring, Unity Catalog lineage, and the regression gate |
-| `scripts/` | `setup-lakebase`, `seed-policies`, `smoke-supervisor` |
+| `scripts/` | `setup-lakebase`, `seed-policies`, `smoke-supervisor`, `grant-app-access` (grant the app SP UC + Genie access) |
 | `docs/` | Architecture notes and the tier diagram |
 
 ---

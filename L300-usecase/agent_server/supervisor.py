@@ -26,6 +26,7 @@ import databricks_client as dbx
 from databricks.sdk import WorkspaceClient
 
 from agent_server import subagents
+from agent_server.utils import _with_scheme
 
 SERVICE_IDENTITY = "supervisor-agent@service"  # app/service write identity in the audit trail
 
@@ -56,7 +57,10 @@ def _user_genie_client(user_token: str | None):
         return dbx.client()
     # auth_type='pat' forces token-only auth so the SP OAuth in the app env does not collide
     # with the forwarded user token ("more than one authorization method").
-    return WorkspaceClient(host=dbx.client().config.host, token=user_token, auth_type="pat")
+    # Apps may inject a bare hostname; normalize to an absolute https:// URL so the SDK's
+    # httpx client does not raise UnsupportedProtocol on a schemeless host.
+    return WorkspaceClient(host=_with_scheme(dbx.client().config.host), token=user_token,
+                           auth_type="pat")
 
 
 # ---------------------------------------------------------------------------

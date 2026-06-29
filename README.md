@@ -46,6 +46,41 @@ The workshop is organized around three capabilities that grow tier over tier.
 
 ## Get started
 
+### 1. Clone this repo into your Databricks workspace
+
+The whole workshop runs from a Databricks **Git folder** (Repos), so you get the
+notebooks, data generators, and starter kit in one place and can pull updates as
+new tiers land.
+
+**Option A — UI (recommended)**
+
+1. In your Databricks workspace sidebar, click **Workspace → Users → your user**.
+2. Click **Create → Git folder** (top right).
+3. Paste the repo URL and confirm the details:
+   - **Git repository URL:** `https://github.com/Praneeth16/akzonobel-agentbricks-workshop.git`
+   - **Git provider:** GitHub
+   - **Branch:** `main`
+4. Click **Create Git folder**. The repo clones to
+   `/Workspace/Users/<you>/akzonobel-agentbricks-workshop`.
+5. To get later updates, open the Git folder and click **⋯ → Git… → Pull**.
+
+> Private repo? Add a GitHub Personal Access Token first under
+> **Settings → Linked accounts (Git integration)**, then clone.
+
+**Option B — Databricks CLI (from your laptop)**
+
+```bash
+databricks repos create \
+  --url https://github.com/Praneeth16/akzonobel-agentbricks-workshop.git \
+  --provider gitHub \
+  --path /Workspace/Users/<you>/akzonobel-agentbricks-workshop
+```
+
+> On **Vocareum**, you don't clone — the course bundle is preloaded. See
+> `vocareum-course/` and start from `_AGENDA/00 - Start Here`.
+
+### 2. Run the workshop
+
 1. Run the shared data setup once. See `data/`. It loads the coatings tables, the document volume, the Genie spaces, and the vector index into Unity Catalog.
 2. Open `L100-foundations/` and follow its README.
 3. Climb the ladder.
@@ -63,7 +98,7 @@ The workshop is organized around three capabilities that grow tier over tier.
 
 ## Status
 
-This repository is built tier by tier. L100 foundations is complete and every notebook has been run end to end on a live workspace. L200, L300, the hackathon kit, and the Vocareum course package are built and code-reviewed; their agent/app runtime paths still need in-workspace verification.
+This repository is built tier by tier. L100 foundations is complete: every notebook has been run end to end on a live workspace, and the L100 coded agent is deployed on Databricks Apps and answered a governed query through its managed MCP tool. L200 and L300 are built, code-reviewed, and made deployable on Databricks Apps (the same four deploy fixes proven on L100); their live app deploy needs the per-deploy catalog variable and the app service-principal grants.
 
 | Item | State |
 |---|---|
@@ -74,9 +109,9 @@ This repository is built tier by tier. L100 foundations is complete and every no
 | `L100-foundations/01_agent_bricks_types.md` | Built, UI and programmatic paths, prerequisites verified |
 | `L100-foundations/02_agent_evaluation.ipynb` | Built, run on workspace |
 | `L100-foundations/03_short_term_memory.ipynb` | Built, run on workspace |
-| `L100-foundations/L100-agent-langgraph/` | Built (LangGraph + ResponsesAgent + 1 managed MCP tool), codex-reviewed; in-workspace run pending |
-| `L200-capabilities/` | Built (OpenAI SDK agent, MCP server, action_plane, Lakebase memory, eval), codex-reviewed; in-workspace run pending |
-| `L300-usecase/` | Built (LangGraph supervisor, full action_plane, e2e app, advanced eval), codex-reviewed; in-workspace run pending |
+| `L100-foundations/L100-agent-langgraph/` | Built + codex-reviewed + **deployed on Databricks Apps and answered a live governed query** through its managed MCP tool |
+| `L200-capabilities/` | Built + codex-reviewed; **deployability fixed** (packaging, catalog-in-Apps, host scheme, startup resilience); deploy with `--var catalog=...` + run `grant-app-access` |
+| `L300-usecase/` | Built + codex-reviewed; **deployability fixed** (same four); deploy with `--var catalog=...` + run `grant-app-access` |
 | `hackathon-starter-kit/` | 11 tracks, 11 starter prompts, 6 ai-dev-kit skills, and the relocated AppKit hackathon hub |
 | `vocareum-course/` | Serverless Vocareum package: ordered notebooks, learner README, cfg, lifecycle scripts, `.dbc` bundle builder |
 

@@ -56,8 +56,21 @@ curl -X POST "$APP_URL/invocations" \
 
 ## After deploy
 
+The app runs as its **own service principal** (SP), not as you — so it has none of your grants. Give the SP what it needs:
+
+```bash
+# The app's SP client id:
+SP=$(databricks apps get agent-akzo-capabilities --output json | jq -r '.service_principal_client_id')
+
+# Unity Catalog access for the agent's tools (USE CATALOG/SCHEMA, EXECUTE on functions, SELECT on tables).
+# --catalog / --tools-schema default to AKZO_CATALOG / AKZO_TOOLS_SCHEMA from env. Pass --data-schema per data schema.
+uv run grant-app-access --service-principal "$SP" --catalog "$AKZO_CATALOG" --data-schema akzo_finance
+```
+
 - Grant the app's SP access to Lakebase — see **lakebase-setup**.
 - If you enabled the Action Plane, set `ENABLE_ACTIONS_API=true` in `databricks.yml` config env and re-deploy.
+
+> **Catalog must be passed at deploy.** The Apps runtime does NOT resolve `current_catalog()`, so the app reads its catalog from the `AKZO_CATALOG` env var, sourced from the `catalog` bundle variable. Always deploy with `--var catalog=<your-catalog>` (and `--var llm_endpoint=<your-endpoint>`); never hardcode them.
 
 ## Debug
 

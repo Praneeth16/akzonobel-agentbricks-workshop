@@ -1,6 +1,17 @@
 bundle:
   name: akzo_l100_agent_langgraph
 
+# Nothing workspace-specific is hardcoded. Set at deploy:
+#   databricks bundle deploy --var catalog=<your_catalog> [--var llm_endpoint=<endpoint>]
+# current_catalog() does NOT resolve in the Apps runtime, so catalog is required.
+variables:
+  catalog:
+    description: Unity Catalog holding the coatings data (akzo_finance etc.). Required for Apps deploy.
+    default: ""
+  llm_endpoint:
+    description: Foundation Model serving endpoint the agent calls.
+    default: "databricks-meta-llama-3-3-70b-instruct"
+
 resources:
   apps:
     akzo_l100_agent_langgraph:
@@ -22,9 +33,14 @@ resources:
             value: "300"
           - name: MLFLOW_EXPERIMENT_ID
             value_from: "experiment"
-          # LLM endpoint is REQUIRED (no default in code). Override per workspace as needed.
+          # LLM endpoint is REQUIRED (no default in code).
           - name: LLM_ENDPOINT
-            value: "databricks-meta-llama-3-3-70b-instruct"
+            value: ${var.llm_endpoint}
+          # current_catalog() does NOT resolve in the Apps runtime, so AKZO_CATALOG is REQUIRED here.
+          - name: AKZO_CATALOG
+            value: ${var.catalog}
+          - name: AKZO_SCHEMA
+            value: "akzo_finance"
 
       # Resources this app's identity is granted. The serving endpoint is the chat model
       # the LangGraph agent calls; quickstart fills in the experiment_id. The agent consumes

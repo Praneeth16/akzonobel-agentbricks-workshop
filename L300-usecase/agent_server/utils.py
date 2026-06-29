@@ -94,15 +94,28 @@ def get_llm_endpoint() -> str:
     return _validate("LLM endpoint", endpoint, _ENDPOINT)
 
 
+def _with_scheme(h: Optional[str]) -> Optional[str]:
+    """Ensure a host is an absolute http(s):// URL.
+
+    Databricks Apps inject DATABRICKS_HOST as a BARE hostname (no scheme); the MCP / Genie /
+    HTTP clients build URLs from it and httpx then raises ``UnsupportedProtocol`` on a
+    schemeless URL. Normalize to https:// (and strip any trailing slash) so every URL we
+    build downstream is absolute."""
+    if not h:
+        return None
+    h = h.rstrip("/")
+    return h if h.startswith(("http://", "https://")) else f"https://{h}"
+
+
 def get_databricks_host() -> Optional[str]:
-    """Resolve the workspace host from env or the Databricks SDK config."""
+    """Resolve the workspace host from env or the Databricks SDK config, scheme-normalized."""
     host = os.environ.get("DATABRICKS_HOST")
     if host:
-        return host.rstrip("/")
+        return _with_scheme(host)
     try:
         from databricks.sdk import WorkspaceClient
 
-        return WorkspaceClient().config.host
+        return _with_scheme(WorkspaceClient().config.host)
     except Exception as e:  # noqa: BLE001
         logging.debug("Could not resolve Databricks host: %s", e)
         return None

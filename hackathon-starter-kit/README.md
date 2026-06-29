@@ -14,7 +14,7 @@ The first six tracks are the priority use cases called out for Malvika and the t
 
 | Path | Purpose |
 |---|---|
-| `.claude/skills/` | ai-dev-kit skills: `scaffold-copilot`, `add-genie-space`, `add-mcp-tool`, `add-connector`, `deploy`, and `generate-synthetic-data` |
+| `.claude/skills/` | ai-dev-kit skills: `scaffold-copilot`, `add-genie-space`, `add-mcp-tool`, `add-connector`, `deploy`, `deploy-to-databricks-apps` (Asset Bundle path: avoids the 4 real Apps deploy crashes), and `generate-synthetic-data` |
 | `starter-prompts/` | One ready-to-use prompt per track |
 | `tracks/` | Forkable team guides using the required track template |
 | `TRACK_TEMPLATE.md` | The template every track README follows |

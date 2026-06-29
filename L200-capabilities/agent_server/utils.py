@@ -108,10 +108,24 @@ async def deduplicate_input(
     return messages
 
 
+def _with_scheme(host: Optional[str]) -> Optional[str]:
+    """Databricks Apps inject DATABRICKS_HOST as a BARE hostname (no scheme); httpx
+    rejects a URL with no scheme ("Request URL is missing an 'http://' or 'https://'
+    protocol"). Normalize to an absolute https:// URL with no trailing slash."""
+    if not host:
+        return None
+    host = host.rstrip("/")
+    return host if host.startswith(("http://", "https://")) else f"https://{host}"
+
+
 def get_databricks_host(workspace_client: WorkspaceClient | None = None) -> Optional[str]:
-    workspace_client = workspace_client or WorkspaceClient()
+    # Prefer the explicit env var (what Apps sets) over constructing a client.
+    env_host = os.environ.get("DATABRICKS_HOST")
+    if env_host:
+        return _with_scheme(env_host)
     try:
-        return workspace_client.config.host
+        workspace_client = workspace_client or WorkspaceClient()
+        return _with_scheme(workspace_client.config.host)
     except Exception as e:
         logging.exception(f"Error getting databricks host from env: {e}")
         return None
