@@ -82,6 +82,23 @@ resources:
           experiment:
             experiment_id: ${var.experiment_id}
             permission: 'CAN_MANAGE'
+        # Bind the Lakebase instance so Databricks Apps injects PGHOST/PGUSER/PGPASSWORD/
+        # PGDATABASE for the app SP and registers it as a Postgres role. Required for both
+        # the agent's Lakebase memory + Action Plane tables AND the chat UI's startup
+        # migration (which reads PGHOST/PGDATABASE). Without this the app crashes at boot
+        # with "password authentication failed" / "PGHOST and PGDATABASE must be set".
+        - name: 'database'
+          database:
+            database_name: "databricks_postgres"
+            instance_name: ${var.lakebase_instance}
+            permission: 'CAN_CONNECT_AND_CREATE'
+        # Scope the app SP token to query the model the agent calls. Without this the SP's
+        # SDK/model calls return a non-JSON error the SDK reports as "unable to parse
+        # response" instead of running.
+        - name: 'serving-endpoint'
+          serving_endpoint:
+            name: ${var.llm_endpoint}
+            permission: CAN_QUERY
 
 targets:
   dev:

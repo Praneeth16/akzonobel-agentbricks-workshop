@@ -4,7 +4,7 @@ This kit turns the workshop into forkable team tracks. Each track starts from th
 
 The expected build environment is **Vocareum plus Databricks**. Teams should use their assigned Vocareum workspace, catalog, and SQL warehouse, then lean on Databricks Genie code generation for the first draft of notebooks, SQL, tool functions, and agent instructions. The ai-dev-kit skills in this folder give Genie code the right scaffold and guardrails instead of starting from a blank prompt.
 
-The first six tracks are the priority use cases called out for Malvika and the team. The remaining tracks come from the `WORKSHOP_MASTER_PLAN.md` starter-kit scope: top-ranked workshop use cases plus the document-extraction cluster.
+The first six tracks are the priority use cases. The remaining tracks are top-value workshop use cases plus a document-extraction cluster.
 
 > All data is synthetic. Product names, customers, suppliers, contracts, and documents are invented for the workshop.
 
@@ -35,7 +35,7 @@ The first six tracks are the priority use cases called out for Malvika and the t
 | `05-forecast-planner-mmf` | #6 Forecast planner copilot on MMF | `ai_forecast` on an SCM series + team-built forecast tables | Planner compares versions, sees forecast drivers, and drafts an override recommendation |
 | `06-pricing-quote-generation` | #18 Pricing and quote-generation agent | text extraction + pricing tool + action approval | Inbound request becomes a draft quote package with human approval |
 
-### Master-Plan Additions
+### Additional Tracks
 
 | Track | Use case | Starting point | Best demo outcome |
 |---|---|---|---|

@@ -68,21 +68,18 @@ def grant_app_access(sp: str, catalog: str, tools_schema: str, data_schemas: lis
     for schema in schemas:
         _grant(f"GRANT USE SCHEMA ON SCHEMA {catalog}.{schema} TO {principal}")
 
-    # EXECUTE on every function in the tools schema — these are the agent's tools.
-    _grant(
-        f"GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA {catalog}.{tools_schema} TO {principal}"
-    )
+    # EXECUTE on the tools schema — Unity Catalog cascades this to every function in the
+    # schema (current and future), so the agent can call all its UC-function tools. (UC has
+    # no `ON ALL FUNCTIONS IN SCHEMA` form — that is Hive/Postgres syntax and is rejected.)
+    _grant(f"GRANT EXECUTE ON SCHEMA {catalog}.{tools_schema} TO {principal}")
 
-    # SELECT on every table in each data schema — what the functions read.
+    # SELECT on each data schema — cascades to every table the functions read.
     for schema in data_schemas:
-        _grant(
-            f"GRANT SELECT ON ALL TABLES IN SCHEMA {catalog}.{schema} TO {principal}"
-        )
+        _grant(f"GRANT SELECT ON SCHEMA {catalog}.{schema} TO {principal}")
 
     print(
-        "\nGrants complete. If a function or table did not exist yet, register it and "
-        "re-run this script. Tip: ALL FUNCTIONS / ALL TABLES does not cover objects "
-        "created afterwards — re-run after adding new tools or tables."
+        "\nGrants complete. EXECUTE/SELECT on the schema cascade to all current and future "
+        "functions/tables in it, so new tools or tables are covered without re-running."
     )
 
 

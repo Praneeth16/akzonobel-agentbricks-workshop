@@ -75,6 +75,21 @@ resources:
           - name: MLFLOW_EXPERIMENT_ID
             value: ${var.experiment_id}
 
+      # App resources scope the app service principal's OAuth token. Without declaring the
+      # serving endpoint and SQL warehouse here, the SP token cannot call the model-query or
+      # SQL statement APIs and the SDK surfaces it as "unable to parse response" (a non-JSON
+      # error the typed parser can't read), not a clean 403. With them declared, the read
+      # legs (text2sql ai_query) and the model calls run under a properly-scoped SP token.
+      resources:
+        - name: 'serving-endpoint'
+          serving_endpoint:
+            name: ${var.llm_endpoint}
+            permission: CAN_QUERY
+        - name: 'sql-warehouse'
+          sql_warehouse:
+            id: ${var.warehouse_id}
+            permission: CAN_USE
+
 targets:
   dev:
     mode: development

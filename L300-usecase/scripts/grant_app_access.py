@@ -2,8 +2,8 @@
 
 The supervisor app runs as a service principal (SP). For the read plane (the three domain
 legs) and the act plane (the governed HTTP connection) to work under that SP, it needs Unity
-Catalog grants on the coatings catalog + schemas, EXECUTE on the external-systems connection,
-and CAN RUN on each domain's Genie space. This script applies all of them.
+Catalog grants on the coatings catalog + schemas, USE CONNECTION on the external-systems
+connection, and CAN RUN on each domain's Genie space. This script applies all of them.
 
 Nothing is hardcoded: the SP and the catalog are PARAMETERS. Run after the data + Lakebase
 setup, before (or just after) deploying the app:
@@ -65,8 +65,9 @@ def _grant_uc(sp: str, catalog: str, schemas: list[str], connection: str | None)
             f"GRANT SELECT ON SCHEMA {fq} TO {principal}",
         ]
     if connection:
-        # EXECUTE on the UC connection is what lets the governed http_request() path run.
-        stmts.append(f"GRANT EXECUTE ON CONNECTION {connection} TO {principal}")
+        # USE CONNECTION on the UC connection is what lets the governed http_request() path run.
+        # (EXECUTE is not a valid privilege on a CONNECTION entity.)
+        stmts.append(f"GRANT USE CONNECTION ON CONNECTION {connection} TO {principal}")
 
     for stmt in stmts:
         dbx.run_sql(stmt)
@@ -74,31 +75,31 @@ def _grant_uc(sp: str, catalog: str, schemas: list[str], connection: str | None)
 
 
 def _grant_genie(sp: str) -> None:
-    """Best-effort CAN RUN on each configured Genie space via the SDK permissions API."""
+    """CAN RUN on each configured Genie space via the permissions REST API.
+
+    The typed SDK surface for Genie-space permissions varies across versions (older clients
+    have no ``genie.set_permissions``), so we PATCH the generic permissions endpoint
+    directly — it is stable: PATCH /api/2.0/permissions/genie/{space_id}."""
     space_ids = {d: os.environ.get(f"{d}_SPACE_ID", "").strip() for d in _DOMAINS}
     configured = {d: s for d, s in space_ids.items() if s}
     if not configured:
         print("  (no *_SPACE_ID set in the environment — skipping Genie grants)")
         return
-    try:
-        from databricks.sdk.service import iam
-    except Exception as e:  # noqa: BLE001
-        _print_genie_manual(configured, sp, reason=str(e))
-        return
 
     w = dbx.client()
     for domain, space_id in configured.items():
         try:
-            w.genie.set_permissions(
-                space_id=space_id,
-                access_control_list=[
-                    iam.GenieSpaceAccessControlRequest(
-                        service_principal_name=sp, permission_level="CAN_RUN"
-                    )
-                ],
+            w.api_client.do(
+                "PATCH",
+                f"/api/2.0/permissions/genie/{space_id}",
+                body={
+                    "access_control_list": [
+                        {"service_principal_name": sp, "permission_level": "CAN_RUN"}
+                    ]
+                },
             )
             print(f"  ok: {domain} Genie space {space_id} -> CAN_RUN for {sp}")
-        except Exception as e:  # noqa: BLE001 — SDK surface varies; fall back to manual.
+        except Exception as e:  # noqa: BLE001 — fall back to the manual instruction.
             _print_genie_manual({domain: space_id}, sp, reason=str(e))
 
 
@@ -120,7 +121,7 @@ def main() -> None:
     p.add_argument("--commercial-schema",
                    default=os.environ.get("AKZO_COMMERCIAL_SCHEMA", "akzo_commercial"))
     p.add_argument("--connection", default=os.environ.get("AKZO_HTTP_CONNECTION", "akzo_external_systems"),
-                   help="UC HTTP connection to grant EXECUTE on (empty string to skip).")
+                   help="UC HTTP connection to grant USE CONNECTION on (empty string to skip).")
     p.add_argument("--skip-genie", action="store_true", help="Skip the Genie space grants.")
     args = p.parse_args()
 
