@@ -8,6 +8,11 @@ sync:
     - ".venv"
     - "node_modules"
     - "load-test-runs"
+    # Never ship uv.lock to Apps: it can pin wheels to an internal proxy host
+    # (e.g. pypi-proxy.dev.databricks.com) that the Apps build network can't
+    # reach, which fails the build with "error installing packages". With
+    # requirements.txt present the builder uses pip + the platform mirror.
+    - "uv.lock"
 
 # Override per workspace at deploy time, e.g.:
 #   databricks bundle deploy --var="catalog=my_catalog" --var="warehouse_id=abc123"
@@ -38,7 +43,13 @@ resources:
       description: "AkzoNobel L200 capabilities agent (OpenAI Agents SDK + UC tools + Action Plane)"
       source_code_path: ./
       config:
-        command: ["uv", "run", "start-app"]
+        # Backend-only ASGI entrypoint. NOT `uv run start-app`: that path does a
+        # runtime `uv sync` (re-resolving deps against a uv.lock) AND a runtime
+        # git-clone + `npm install/build` of a chat UI — both fail on Databricks
+        # Apps (internal proxy / blocked public registries / no egress). All
+        # startup work (agent registration, MLflow, Action Plane mount, Lakebase
+        # tables) runs at import time in start_server.py, so uvicorn is enough.
+        command: ["uvicorn", "agent_server.start_server:app", "--host", "0.0.0.0", "--port", "8000"]
         env:
           - name: MLFLOW_TRACKING_URI
             value: "databricks"
@@ -51,7 +62,7 @@ resources:
           - name: CHAT_PROXY_TIMEOUT_SECONDS
             value: "300"
           - name: MLFLOW_EXPERIMENT_ID
-            value_from: "experiment"
+            value: ${var.experiment_id}
           - name: AGENT_NAME
             value: "akzo-capabilities-agent"
           - name: LLM_ENDPOINT

@@ -39,6 +39,15 @@ resources:
       name: "akzo-multidomain-supervisor"
       description: "AkzoNobel Multi-domain Supervisor — Finance / SCM / Commercial Genie + full Action Plane"
       source_code_path: ./
+      # Scopes the app can request on the calling user's behalf (OBO). Without `sql`
+      # and `dashboards.genie` the forwarded user token can't call the SQL Statement
+      # Execution API or Genie, and the data legs fail with
+      # "403 Forbidden — Invalid scope, required scopes: sql". The user must also
+      # hold the underlying warehouse / Genie / table grants for OBO to resolve.
+      user_api_scopes:
+        - "sql"
+        - "dashboards.genie"
+        - "serving.serving-endpoints"
       config:
         command: ["uvicorn", "agent_server.main:app", "--host", "0.0.0.0", "--port", "8000"]
         env:
@@ -60,12 +69,11 @@ resources:
             value: ${var.llm_endpoint}
           - name: DATABRICKS_WAREHOUSE_ID
             value: ${var.warehouse_id}
-          - name: FINANCE_SPACE_ID
-            value: ${var.finance_space_id}
-          - name: SCM_SPACE_ID
-            value: ${var.scm_space_id}
-          - name: COMMERCIAL_SPACE_ID
-            value: ${var.commercial_space_id}
+          # Genie space ids are intentionally omitted here: when unset the supervisor
+          # routes domain legs through the governed SQL (text2sql) fallback. Databricks
+          # Apps rejects an env entry whose value resolves to empty ("must specify
+          # value or valueFrom"), so only add these back with REAL space ids (via
+          # --var or app resources) in a workspace that has Genie spaces provisioned.
           - name: LAKEBASE_INSTANCE
             value: ${var.lakebase_instance}
           - name: LAKEBASE_SCHEMA

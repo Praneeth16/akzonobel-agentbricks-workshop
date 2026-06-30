@@ -1,0 +1,16 @@
+# L200 Capabilities agent — Databricks Apps runtime dependencies.
+# (Local dev uses pyproject.toml + uv; this file is the Apps deploy surface.)
+# Shipping this makes the Apps build use pip against the platform's own package
+# mirror, instead of falling back to uv + a uv.lock that may pin an unreachable
+# internal proxy. Mirrors the proven L300 pattern.
+fastapi>=0.129.0
+uvicorn>=0.41.0
+databricks-openai[memory]>=0.13.0
+databricks-agents>=1.9.3
+databricks-ai-bridge>=0.5.0
+databricks-sdk>=0.70.0
+mlflow>=3.10.0
+openai-agents>=0.4.1
+psycopg[binary]>=3.2.0
+python-dotenv>=1.2.1
+opentelemetry-exporter-otlp-proto-grpc>=1.25.0
