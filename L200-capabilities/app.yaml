@@ -1,4 +1,8 @@
-command: ["uv", "run", "start-app"]
+# Backend-only ASGI entrypoint. NOT `uv run start-app`: that runtime path does a
+# `uv sync` and a git-clone + npm build of a chat UI, both of which fail on
+# Databricks Apps (internal proxy / blocked registries / no egress). Startup work
+# runs at import time in start_server.py, so uvicorn alone is sufficient.
+command: ["uvicorn", "agent_server.start_server:app", "--host", "0.0.0.0", "--port", "8000"]
 
 env:
   - name: MLFLOW_TRACKING_URI

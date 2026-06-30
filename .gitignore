@@ -9,3 +9,9 @@ __pycache__/
 *.pyc
 data/output/
 data/setup/space_ids.json
+.gstack/
+# uv.lock pins wheel URLs to whatever index uv is configured with locally
+# (e.g. pypi-proxy.dev.databricks.com), which the Databricks Apps build network
+# can't reach -> "error installing packages". Apps deploys use requirements.txt;
+# never commit the lock.
+uv.lock
